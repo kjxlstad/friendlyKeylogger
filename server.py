@@ -7,7 +7,10 @@ keymap = [['',      'q',      'w',   'e',    'r', 't',     'y',     'u', 'i',   
           ['esc',   'ctrl_l', 'cmd', 'alt_l', '', 'space', 'space', '',  'left', 'down', 'up',  'right'   ]]   
 
 heatmap = [[0 for i in range(12)] for i in range(4)]
-#print(planck)
+
+# Returns a tuple with all indices where the key was found in keymap
+def find_key_pos(key) :
+	return [(ix, iy) for ix, row in enumerate(keymap) for iy, i in enumerate(row) if i == key]
 
 #def update(key) :
 
