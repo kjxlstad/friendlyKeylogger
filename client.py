@@ -1,27 +1,20 @@
-import http.client
 from pynput import keyboard
+import os
 
-client = http.client.HTTPConnection('localhost', 8888)
-
-def post_request(client, data) :
-	client.request('POST', '/process', data)
+def write_to_file(data) :
+	with open('log.log', 'w') as f:
+		f.write(data)
+	f.close()
 
 def clean_keycode(key) :
 	key = str(key)
 	return (key, key[4:])[key.startswith('Key')][1:len(key)-1]
 
-def on_press(key) :
-	post_request(client, '{"%s" : 1}' % (clean_keycode(key))) 	
-	check_response()
+def on_press(key) : write_to_file(clean_keycode(key) + ' 1')
 
-def on_release(key) :
-	post_request(client, '{"%s" : 0}' % (clean_keycode(key)))
-	check_response()
+def on_release(key) : write_to_file(clean_keycode(key) + ' 0')
 
-def check_response() :
-	m = client.getresponse().read()
-	if len(m) < 20 : print('All good') # lol
-	else : print(m)
+open('log.log', 'w').close()
 
 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener :
 	listener.join()
