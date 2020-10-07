@@ -1,0 +1,23 @@
+{
+  "name": "friendlykeylogger",
+  "version": "1.0.0",
+  "description": "Small terminal program to visualize Planck keyboard input",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kjxlstad/friendlyKeylogger.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kjxlstad/friendlyKeylogger/issues"
+  },
+  "homepage": "https://github.com/kjxlstad/friendlyKeylogger#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
+}

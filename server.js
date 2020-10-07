@@ -1,6 +1,7 @@
+require('dotenv').config()
 const fs = require('fs')
 const { exec } = require('child_process')
-const log = '/mnt/c/users/jonathan/documents/friendlyKeylogger/log.log'
+const log = process.env.WINPATH
 
 let a = 0
 fs.watch(log, (e, f) => {

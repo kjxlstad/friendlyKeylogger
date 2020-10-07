@@ -1,11 +1,26 @@
-#! usr/bin/env bash
-# Usage ./run.sh directory whrere windows files will be places
+#!/bin/bash
+# Usage ./run.sh with windows folder as argument where the client will be created
+# Eg. ./run.sh /user/name/documents
 
-dir="$1"/friendlyKeyloggerClient
-if [ ! -d "$dir" ]; then
-	mkdir $dir
-	cp -r client "$dir"/client
-	touch "$dir"/log.log
-else
-	echo Folder "$dir" already exists, aborting!
+if [ $# -eq 0 ]; then
+	echo "No folder path supplied!"
+	exit;
 fi
+
+dir=/mnt/c"$1"/friendlyKeyloggerClient/
+
+if [[ -d "$dir" ]]; then
+	read -p "Folder $dir allready exists, do you want to overwrite it? y/n"
+	case $yn in
+		[Yy]* ) rm -r "$dir"; break;;
+		[Nn]* ) exit;;
+		* ) echo "Please answer yes or no"
+	esac
+fi
+
+mkdir $dir
+cp -r client "$dir"/client
+	
+log="$dir"log.log
+echo WINPATH="$log" > .env
+touch "$log"
