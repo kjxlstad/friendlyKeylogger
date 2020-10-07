@@ -6,3 +6,5 @@ Due to difficulties acsessing keyboard hooks on WSL, a client and server setup i
 Warning, janky botched code.
 Python3 on clientside for the simple keyboard input, writing to file.
 Node reading file with bash for the speed.
+
+<img src="https://i.imgur.com/rOXukia.png"/>
