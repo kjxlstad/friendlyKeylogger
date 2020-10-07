@@ -1,8 +1,10 @@
 from pynput import keyboard
 import os
 
+log = '../log.log'
+
 def write_to_file(data) :
-	with open('log.log', 'w') as f:
+	with open(log, 'w') as f:
 		f.write(data)
 	f.close()
 
@@ -14,7 +16,8 @@ def on_press(key) : write_to_file(clean_keycode(key) + ' 1')
 
 def on_release(key) : write_to_file(clean_keycode(key) + ' 0')
 
-open('log.log', 'w').close()
+# Clear file
+open(log, 'w').close()
 
 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener :
 	listener.join()
