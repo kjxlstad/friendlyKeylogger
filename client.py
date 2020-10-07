@@ -6,16 +6,16 @@ client = http.client.HTTPConnection('localhost', 8888)
 def post_request(client, data) :
 	client.request('POST', '/process', data)
 
+def clean_keycode(key) :
+	key = str(key)
+	return (key, key[4:])[key.startswith('Key')]
+
 def on_press(key) :
-	#post_request(client, '{"{0}" : 1}'.format(key))
-	post_request(client, '{"' + str(key) + '" : 1}') 
-	#post_request(client, '{"test" : 1}')	
+	post_request(client, '{"' + clean_keycode(key) + '" : 1}') 	
 	check_response()
 
 def on_release(key) :
-	#post_request(client, '{"{0}" : 0'.format(key))
-	post_request(client, '{"' + str(key) + '" : 0}')
-	#post_request(client, '{"test" : 0}')
+	post_request(client, '{"' + clean_keycode(key) + '" : 0}')
 	check_response()
 
 def check_response() :
