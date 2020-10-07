@@ -10,7 +10,7 @@ def write_to_file(data) :
 
 def clean_keycode(key) :
 	key = str(key)
-	return (key, key[4:])[key.startswith('Key')][1:len(key)-1]
+	return (key, key[4:])[key.startswith('Key')]#[1:len(key)-1]
 
 def on_press(key) : write_to_file(clean_keycode(key) + ' 1')
 
