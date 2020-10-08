@@ -17,12 +17,14 @@ const planck = {
 }
 
 var c = new Canvas()
-const keyWidth = Math.min(c.width / (planck.width + 1), c.height / (planck.height + 1))
-const keyHeight = keyWidth * 0.8
+const keyHeight = (c.height - 8)/ (planck.height)
+const keyWidth = keyHeight * 1.15
+//const keyWidth = Math.min(c.width / (planck.width + 1), c.height / (planck.height + 1))
+//const keyHeight = keyWidth * 0.8
 
 function drawBox(x0, y0, x1, y1, filled) {
-	if (filled) for (let j = y0; j < y1; j += 1) line(x0, j, x1, j, c.set.bind(c))
-	else for (let j = y0; j < y1; j += 1) line(x0, j, x1, j, c.unset.bind(c))
+	if (filled) for (let i = y0; i < y1; i++) line(x0, i, x1, i, c.set.bind(c))
+	else for (let i = y0; i < y1; i++) line(x0, i, x1, i, c.unset.bind(c))
 	drawBorder()	
 	process.stdout.write(c.frame())
 }
