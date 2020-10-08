@@ -1,9 +1,11 @@
-require('dotenv').config()
 const fs = require('fs')
 const { exec } = require('child_process')
 const blessed = require('blessed')
+
+require('dotenv').config()
 const log = process.env.WINPATH
 
+// Current keyboard specifics TODO move to config file
 const planck = {
 	width: 12,
 	height: 4,
@@ -14,31 +16,11 @@ const planck = {
 			  'esc',   'ctrl_l', 'cmd', 'alt_l', '',    'space', 'space', '',    'left', 'down', 'up', 'right'     ]
 }
 
+// Array of all blessed boxes
 let keys = []
 
+// Main blessed object, dimensionality 134 x 57 chars at horizontally split fullscreen terminal
 let screen = blessed.screen({smartCSR: true, dockBorders: true})
-// Regular half window at current fontsize is 134 * 57
-
-
-/*
-var box = blessed.box({
-	top: 'center',
-	left: 'center',
-	width: '50%',
-	height: '50%',
-	content: 'Test {bold}Tester{/bold}',
-	border: {
-		type: 'line'
-	},
-	style: {
-		fg: 'white',
-		hover: {
-			bg: 'black'
-		}
-	}
-})
-*/
-
 
 // TODO calculate on the go, now based on 134 * 57 matrix
 const keyWidth = 10
@@ -70,8 +52,6 @@ screen.key(['escape', 'q', 'C-c'], (ch, key) => {
 	return process.exit(0)
 })
 
-screen.render()
-
 let a = 0
 fs.watch(log, (e, f) => {
 	if (a++ % 4 === 0) {
@@ -81,3 +61,5 @@ fs.watch(log, (e, f) => {
 		})
 	}
 })
+
+screen.render()
