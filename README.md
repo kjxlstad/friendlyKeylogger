@@ -7,4 +7,5 @@ Warning, janky botched code.
 Python3 on clientside for the simple keyboard input, writing to file.
 Node reading file with bash for the speed.
 
-<img src="https://i.imgur.com/rOXukia.png"/>
+**Current version, styling for later (ctrl and alt are being held for screencap)**
+<img src="https://i.imgur.com/y27Uyhj.png"/>
