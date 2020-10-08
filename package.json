@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/kjxlstad/friendlyKeylogger#readme",
   "dependencies": {
-    "dotenv": "^8.2.0"
+    "bresenham": "0.0.4",
+    "dotenv": "^8.2.0",
+    "drawille": "^1.1.1",
+    "terminal-kit": "^1.43.0"
   }
 }
