@@ -1,5 +1,4 @@
 require('dotenv').config()
-//const term = require('terminal-kit').terminal
 const fs = require('fs')
 const { exec } = require('child_process')
 var Canvas = require('drawille')
@@ -11,47 +10,38 @@ const planck = {
 	width: 12,
 	height: 4,
 	keymap: 
-			[ '',    'q',      'w',   'e',     'r',   't',     'y',     'u',   'i',    'o',    'p',  'backspace',
-			'tab',   'a',      's',   'd',     'f',   'g',     'h',     'j',   'k',    'l',    ';',  '\'',
-			'shift', 'z',      'x',   'c',     'v',   'b',     'n',     'm',   ',',    '.',    '/',  'enter',
-			'esc',   'ctrl_l', 'cmd', 'alt_l', '',    'space', 'space', '',    'left', 'down', 'up', 'right'     ]
+			[ '',      'q',      'w',   'e',     'r',   't',     'y',     'u',   'i',    'o',    'p',  'backspace',
+			  'tab',   'a',      's',   'd',     'f',   'g',     'h',     'j',   'k',    'l',    ';',  '\'',
+			  'shift', 'z',      'x',   'c',     'v',   'b',     'n',     'm',   ',',    '.',    '/',  'enter',
+			  'esc',   'ctrl_l', 'cmd', 'alt_l', '',    'space', 'space', '',    'left', 'down', 'up', 'right'     ]
 }
 
 var c = new Canvas()
-var keyWidth = Math.min(c.width / (planck.width + 1), c.height / (planck.height + 1))
-var keyHeight = keyWidth * 0.8
+const keyWidth = Math.min(c.width / (planck.width + 1), c.height / (planck.height + 1))
+const keyHeight = keyWidth * 0.8
 
 function drawBox(x0, y0, x1, y1, filled) {
-	console.clear()
-	if (filled) {
-		for (let j = y0; j < y1; j++) {
-			line(x0, j, x1, j, c.set.bind(c))
-		}
-	} else {
-		line(x0, y0, x1, y0, c.set.bind(c)) // top
-		line(x0, y0, x0, y1, c.set.bind(c)) // left
-		line(x1, y0, x1, y1, c.set.bind(c)) // right
-		line(x0, y1, x1, y1, c.set.bind(c)) // bottom
-	}
+	if (filled) for (let j = y0; j < y1; j += 1) line(x0, j, x1, j, c.set.bind(c))
+	else for (let j = y0; j < y1; j += 1) line(x0, j, x1, j, c.unset.bind(c))
+	drawBorder()	
 	process.stdout.write(c.frame())
 }
 
-function drawGrid() {
-	c.clear()
-	for (let j = 0; j < planck.height; j++) {
-		for (let i = 0; i < planck.width; i++) {
-			const pos = getPos(i, j)
-			drawBox(pos[0], pos[1], pos[2], pos[3], false)
-		}
-	}
-	process.stdout.write(c.frame())
+function drawBorder() {
+	// Vertical lines
+	line(0, 4, planck.width * keyWidth, 4, c.set.bind(c))
+	line(0, 4 + keyHeight * planck.height, planck.width * keyWidth, 4 + keyHeight * planck.height, c.set.bind(c))
+
+	// Horizontal
+	line(0, 4, 0, 4 + keyHeight * planck.height, c.set.bind(c))
+	line(planck.width * keyWidth, 4, planck.width * keyWidth, 4 + keyHeight * planck.height, c.set.bind(c))
 }
 
 function getPos(i, j) {
-	const x0 = parseInt(keyWidth * i)
-	const x1 = parseInt(keyWidth * (i + 1))
-	const y0 = parseInt(keyHeight * j + 4)
-	const y1 = parseInt(keyHeight * (j + 1) + 4)
+	const x0 = keyWidth * i
+	const x1 = keyWidth * (i + 1)
+	const y0 = keyHeight * j + 4
+	const y1 = keyHeight * (j + 1) + 4
 	return [x0, y0, x1, y1]
 }
 
@@ -76,5 +66,3 @@ fs.watch(log, (e, f) => {
 		})
 	}
 })
-
-drawGrid()
