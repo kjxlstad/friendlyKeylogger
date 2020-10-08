@@ -9,66 +9,72 @@ const log = process.env.WINPATH
 
 const planck = {
 	width: 12,
-	height: 4
+	height: 4,
+	keymap: 
+			[ '',    'q',      'w',   'e',     'r',   't',     'y',     'u',   'i',    'o',    'p',  'backspace',
+			'tab',   'a',      's',   'd',     'f',   'g',     'h',     'j',   'k',    'l',    ';',  '\'',
+			'shift', 'z',      'x',   'c',     'v',   'b',     'n',     'm',   ',',    '.',    '/',  'enter',
+			'esc',   'ctrl_l', 'cmd', 'alt_l', '',    'space', 'space', '',    'left', 'down', 'up', 'right'     ]
 }
 
 var c = new Canvas()
-var keySize = Math.min(c.width / (planck.width + 1), c.height / (planck.height + 1))
+var keyWidth = Math.min(c.width / (planck.width + 1), c.height / (planck.height + 1))
+var keyHeight = keyWidth * 0.8
 
-function drawBox(x0, y0, x1, y1) {
-	line(x0, y0, x1, y0, c.set.bind(c)) // top
-	line(x0, y0, x0, y1, c.set.bind(c)) // left
-	line(x1, y0, x1, y1, c.set.bind(c)) // right
-	line(x0, y1, x1, y1, c.set.bind(c)) // bottom
+function drawBox(x0, y0, x1, y1, filled) {
+	console.clear()
+	if (filled) {
+		for (let j = y0; j < y1; j++) {
+			line(x0, j, x1, j, c.set.bind(c))
+		}
+	} else {
+		line(x0, y0, x1, y0, c.set.bind(c)) // top
+		line(x0, y0, x0, y1, c.set.bind(c)) // left
+		line(x1, y0, x1, y1, c.set.bind(c)) // right
+		line(x0, y1, x1, y1, c.set.bind(c)) // bottom
+	}
+	process.stdout.write(c.frame())
 }
 
-function draw() {
+function drawGrid() {
 	c.clear()
 	for (let j = 0; j < planck.height; j++) {
 		for (let i = 0; i < planck.width; i++) {
-			const x0 = keySize * i
-			const x1 = keySize * (i + 1)
-			const y0 = keySize * j + 4
-			const y1 = keySize * (j + 1) + 4
-			drawBox(x0, y0, x1, y1)
+			const pos = getPos(i, j)
+			drawBox(pos[0], pos[1], pos[2], pos[3], false)
 		}
 	}
 	process.stdout.write(c.frame())
 }
 
-draw()
+function getPos(i, j) {
+	const x0 = parseInt(keyWidth * i)
+	const x1 = parseInt(keyWidth * (i + 1))
+	const y0 = parseInt(keyHeight * j + 4)
+	const y1 = parseInt(keyHeight * (j + 1) + 4)
+	return [x0, y0, x1, y1]
+}
 
-/*
-term.reset()
-term.fullscreen()
-let w = term.width
-let h = term.height
-term.red(w + "x" + h)
+function updateKey(i, j, filled) {
+	const pos = getPos(i, j)
+	drawBox(pos[0], pos[1], pos[2], pos[3], filled)
+}
 
-term.table( [
-				[ 'Rot',   'Q',    'W',   'E',   'R',   'T',     'Y',     'U',   'I',    'O',    'P',  'Backspace' ],
-				[ 'Tab',   'A',    'S',   'D',   'F',   'G',     'H',     'J',   'K',    'L',    ';',  '\''        ],
-				[ 'Shift', 'Z',    'X',   'C',   'V',   'B',     'N',     'M',   ',',    '.',    '/',  'Enter'     ],
-				[ 'Esc',   'Ctrl', 'CMD', 'Alt', 'FUp', 'Space', 'Space', 'FDn', 'Left', 'Down', 'Up', 'Right'     ]
-			] , {
-				hasBorder: true,
-				borderchars: 'lightRounded',
-				borderAttr: {color: 'red'},
-				width: 100
-	}
-)
-*/
-
-
+function update(key, dir) {
+	const linIndex = planck.keymap.findIndex((e) => e == key)
+	const y = Math.floor(linIndex / planck.width)
+	const x = linIndex % planck.width
+	updateKey(x, y, dir)
+}
 
 let a = 0
 fs.watch(log, (e, f) => {
 	if (a++ % 4 === 0) {
 		exec(`tail -1 ${log}`, (err, stdout, stderr) => {
-			console.log(stdout)
-			//term.red(stdout)
-			//term.down(1)
-			//term.left(3)
+			const [key, dir] = stdout.split(' ')
+			update(key, parseInt(dir))
 		})
 	}
 })
+
+drawGrid()
