@@ -14,9 +14,6 @@ planck =
 	  	      'shift', 'z',      'x',   'c',     'v',   'b',     'n',     'm',   ',',    '.',    '/',  'enter',
 		      'esc',   'ctrl_l', 'cmd', 'alt_l', '',    'space', 'space', '',    'left', 'down', 'up', 'right'     ]
 
-
-
-
 # Blessed boxes
 screen = blessed.screen {smartCSR: true, dockBorders: true}
 
@@ -27,8 +24,8 @@ getBox = (i, j) ->
 	x = (keyWidth + 1) * i + 5
 	y = keyHeight * j + 1
 	b = box x, y, keyWidth, keyHeight
-	screen.append(box)
-	return box
+	screen.append b
+	return b
 
 box = (x, y, w, h) ->
 	return blessed.box
@@ -37,12 +34,20 @@ box = (x, y, w, h) ->
 		width: w + 1
 		height: h + 1
 		border:
-			type: 'bg'
-			bg: 'white'
+			type: 'line'
 
-keys = [getBox x, y for y in [0 .. planck.height] for x in [0 .. planck.width]]
-console.log keys
+screen.append blessed.box
+	top: 0
+	left: 0
+	width: 20
+	height: 20
+	content: 'test'
+	border:
+		type: 'line'
 
+screen.render
+
+keys = (getBox i % planck.width, Math.floor i / planck.width for i in [0 ... planck.height * planck.width])
 
 # quit on escape, q, or ctrl-c
 screen.key ['escape', 'q', 'C-c'], (ch, key) ->
@@ -51,14 +56,10 @@ screen.key ['escape', 'q', 'C-c'], (ch, key) ->
 update = (key, dir) ->
 	return if not planck.keymap.includes key
 	pressed = keys[planck.keymap.indexOf key]
-	console.log pressed	
 	if dir
 		pressed.style.bg = 'white'
-		pressed.border.bg = 'white'
 	else
 		pressed.style.bg = 'none'
-		pressed.border.bg = 'none'
-	
 	screen.render
 	return
 
@@ -71,4 +72,4 @@ fs.watch log, (e, f) ->
 			return
 	return
 
-screen.render
+# screen.render
