@@ -22,7 +22,7 @@ screen = blessed.screen {smartCSR: true, dockBorders: true}
 text = "friendly keylogger on #{os.hostname}"
 screen.append blessed.text
 	top: 0
-	left: 0
+	left: 1
 	width: text.length
 	height: 1
 	content: text
@@ -30,9 +30,9 @@ screen.append blessed.text
 # Time
 screen.append blessed.text
 	top: 0
-	right: 0
+	right: 1
 	width: 9
-	height: 0
+	height: 1
 	align: 'right'
 	content: '23:16:45'
 
@@ -40,6 +40,7 @@ screen.append blessed.text
 keyWidth = 3
 keyHeight = 2
 
+# takes x, y coordinates in keymap grid, gets a blessed box customized for its location on screen
 getBox = (i, j) ->
 	x = (keyWidth + 1) * i
 	y = keyHeight * j + 1
@@ -58,13 +59,35 @@ box = (x, y, w, h) ->
 
 keys = (getBox i % planck.width, Math.floor i / planck.width for i in [0 ... planck.height * planck.width])
 
-text = ' Planck '
-screen.append blessed.text
-	top: 1
-	left: 2
-	width: text.length
-	height: 1
-	content: text
+window = (top, left, width, height, title) ->
+	windowBorder top, left, width, height
+	windowTitle top, left + 3, title
+	
+windowTitle = (top, left, title) ->
+	screen.append blessed.text
+		top: top
+		left: left
+		width: title.length
+		height: 1
+		content: title
+
+windowBorder = (top, left, width, height) ->
+	screen.append blessed.text
+		top: top
+		left: left
+		width: width
+		height: height
+		border:
+			type: 'line'
+		
+
+windowTitle 1, 3, ' Planck '
+
+# Hotkeys
+window 1, 50, screen.width - (50 + 1), 19, ' Hotkeys '
+	
+# Stats
+window 10, 0, 49, 10, ' Stats '
 
 # 3 Updating
 update = (key, dir) ->
