@@ -11,4 +11,4 @@ Node reading file with bash for the speed, drawing to terminal using blessed.
 <img src="https://i.imgur.com/y27Uyhj.png"/>
 
 **New gui, based on blessed**
-<img src="https://i.imgur.com/80nP7BD.png"/>
+<img width="200%" height="200%" src="https://i.imgur.com/wFCre5T.png"/>
