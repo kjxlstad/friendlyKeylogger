@@ -72,7 +72,7 @@ screen.key ['escape', 'q', 'C-c'], (ch, key) ->
 
 # (3) Blessed visual layout
 # Header
-text = 'friendly keylogger on #{os.hostname}'
+text = "friendly keylogger on #{os.hostname}"
 screen.append blessed.text
 	top: 0
 	left: 1
