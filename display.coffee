@@ -21,7 +21,7 @@ planck =
 # (2) Helpers
 window = (top, left, width, height, title) ->
 	windowBorder top, left, width, height
-	windowTitle top, left + 3, title
+	windowTitle top, left + 4, title
 	
 windowTitle = (top, left, title) ->
 	screen.append blessed.text
@@ -83,16 +83,16 @@ screen.append blessed.text
 	content: '23:47:13 '
 
 # Planck
-keyWidth = 3
+keyWidth = 4
 keyHeight = 2
 keys = (getKeyBox i % planck.width, Math.floor i / planck.width for i in [0 ... planck.height * planck.width])
-windowTitle 1, 3, ' Planck '
+windowTitle 1, 4, ' Planck '
 
 # Hotkeys
-window 1, 50, screen.width - (50 + 1), 19, ' Hotkeys '
+window 1, 61, screen.width - (61 + 1), 19, ' Hotkeys '
 	
 # Stats
-window 10, 0, 49, 10, ' Stats '
+window 10, 0, 61, 10, ' Stats '
 
 # (4) Updating
 update = (key, dir) ->
