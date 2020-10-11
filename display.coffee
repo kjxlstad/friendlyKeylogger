@@ -7,9 +7,9 @@ require('dotenv').config()
 log = process.env.WINPATH
 
 screen = blessed.screen {smartCSR: true, dockBorders: true}
-
+	
 # Current keyboard specifics TODO: move to config file
-planck = 
+planck =
 	width: 12
 	height: 4
 	keymap: [ '', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'backspace',
@@ -39,6 +39,7 @@ windowBorder = (top, left, width, height) ->
 		height: height
 		border:
 			type: 'line'
+			fg: 'magenta'
 	
 keyBox = (x, y, w, h) ->
 	return blessed.box
@@ -48,6 +49,7 @@ keyBox = (x, y, w, h) ->
 		height: h + 1
 		border:
 			type: 'line'
+			fg: 'magenta'
 
 # takes x, y coordinates in keymap grid, gets a blessed box customized for its location on screen
 getKeyBox = (i, j) ->
@@ -72,15 +74,18 @@ screen.append blessed.text
 	content: text
 
 # Time
-date = new Date
-text = date.toString
-screen.append blessed.text
-	top: 0
-	right: 1
-	width: 9
-	height: 1
-	align: 'right'
-	content: '23:47:13 '
+text = 'logging since '
+
+exec 'date +%H:%M', (err, stdout, stderr) ->
+	text += stdout
+	screen.append blessed.text
+		top: 0
+		right: 1
+		width: text.legnth
+		height: 1
+		align: 'right'
+		content: text
+	screen.render()
 
 # Planck
 keyWidth = 4
@@ -99,7 +104,7 @@ update = (key, dir) ->
 	return if not planck.keymap.includes key
 	pressed = keys[planck.keymap.indexOf key]
 	if dir
-		pressed.style.bg = 'white'
+		pressed.style.bg = 'red'
 	else
 		pressed.style.bg = 'none'
 	screen.render()
@@ -107,12 +112,10 @@ update = (key, dir) ->
 
 a = 0
 fs.watch log, (e, f) ->
-	if a++ % 4 == 0 
+	if a++ % 4 == 0
 		exec "tail -1 #{log}", (err, stdout, stderr) ->
 			[key, dir] = stdout.split(' ')
 			update key, parseInt dir
-			return
-	return
 
 # (5) Start
 screen.render()
