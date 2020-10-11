@@ -55,7 +55,14 @@ keyBox = (x, y, w, h) ->
 getKeyBox = (i, j) ->
 	x = (keyWidth + 1) * i
 	y = keyHeight * j + 1
-	b = keyBox x, y, keyWidth, keyHeight
+
+	# Special cases for spacebar
+	if i == 5 and j == 3
+		b = keyBox x, y, keyWidth * 2 + 1, keyHeight
+	else if i == 6 and j == 3
+		return
+	else
+		b = keyBox x, y, keyWidth, keyHeight
 	screen.append b
 	return b
 
@@ -65,7 +72,7 @@ screen.key ['escape', 'q', 'C-c'], (ch, key) ->
 
 # (3) Blessed visual layout
 # Header
-text = "friendly keylogger on #{os.hostname}"
+text = 'friendly keylogger on #{os.hostname}'
 screen.append blessed.text
 	top: 0
 	left: 1
@@ -80,7 +87,7 @@ exec 'date +%H:%M', (err, stdout, stderr) ->
 	text += stdout
 	screen.append blessed.text
 		top: 0
-		right: 1
+		right: 2
 		width: text.legnth
 		height: 1
 		align: 'right'
@@ -105,6 +112,11 @@ update = (key, dir) ->
 	pressed = keys[planck.keymap.indexOf key]
 	if dir
 		pressed.style.bg = 'red'
+		
+		# Remove sticky keys #TODO fix sending of keys
+		setTimeout () ->
+			update key, 0
+		, 3000
 	else
 		pressed.style.bg = 'none'
 	screen.render()
