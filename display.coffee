@@ -113,25 +113,28 @@ hotkeyBars = []
 window 1, 61, screen.width - (61 + 1), 19, ' Hotkeys '
 
 graphBar = (key, w, n, i) ->
+	nstr = n.toString()
 	return [ blessed.text
 			top: 3 + 2 * i
 			left: 63
-			width: 1
+			width: 3
 			height: 1
-			content: key,
+			content: key
+			align: 'center',
 		blessed.box
 			top: 2 + 2 * i
-			left: 65
+			left: 67
 			width: w
 			height: 3
 			border:
-				type: 'line',
+				type: 'line'
+				fg: 'cyan',
 		blessed.text
 			top: 3 + 2 * i
-			left: 67
-			width: 3
+			left: 69
+			width: nstr.length
 			height: 1
-			content: n.toString()]
+			content: nstr]
 
 # Stats
 window 10, 0, 61, 10, ' Stats '
@@ -173,12 +176,13 @@ updateHotkeys = () ->
 	hotkeys = getKeysWithHighestValues keylog, 8
 	
 	
-	maxWidth = 67
+	maxWidth = 64
+	minWidth = 6
 	maxValue = keylog[hotkeys[0]]
 	
 	i = 0
 	for key in hotkeys
-		w = Math.floor keylog[key] * maxWidth / maxValue
+		w = minWidth + Math.floor keylog[key] * (maxWidth - minWidth) / maxValue 
 		bar = graphBar key, w, keylog[key], i++
 		
 		# Store bars i array
