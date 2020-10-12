@@ -6,6 +6,7 @@ os = require 'os'
 require('dotenv').config()
 log = process.env.WINPATH
 
+
 screen = blessed.screen {smartCSR: true, dockBorders: true}
 	
 # Current keyboard specifics TODO: move to config file
@@ -17,6 +18,7 @@ planck =
 		'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'enter',
 		'esc', 'ctrl_l', 'cmd', 'alt_l', '', 'space', 'space', '', 'left', 'down', 'up', 'right' ]
 
+keylog = {}
 
 # (2) Helpers
 window = (top, left, width, height, title) ->
@@ -50,6 +52,12 @@ keyBox = (x, y, w, h) ->
 		border:
 			type: 'line'
 			fg: 'magenta'
+
+getKeysWithHighestValues = (o, n) ->
+	keys = Object.keys o
+	keys.sort (a, b) ->
+		return o[b] - o[a]
+	return keys.slice 0, n
 
 # takes x, y coordinates in keymap grid, gets a blessed box customized for its location on screen
 getKeyBox = (i, j) ->
@@ -101,26 +109,84 @@ keys = (getKeyBox i % planck.width, Math.floor i / planck.width for i in [0 ... 
 windowTitle 1, 4, ' Planck '
 
 # Hotkeys
+hotkeyBars = []
 window 1, 61, screen.width - (61 + 1), 19, ' Hotkeys '
-	
+
+graphBar = (key, w, n, i) ->
+	return [ blessed.text
+			top: 3 + 2 * i
+			left: 63
+			width: 1
+			height: 1
+			content: key,
+		blessed.box
+			top: 2 + 2 * i
+			left: 65
+			width: w
+			height: 3
+			border:
+				type: 'line',
+		blessed.text
+			top: 3 + 2 * i
+			left: 67
+			width: 3
+			height: 1
+			content: n.toString()]
+
 # Stats
 window 10, 0, 61, 10, ' Stats '
-
+ 
 # (4) Updating
 update = (key, dir) ->
 	return if not planck.keymap.includes key
 	pressed = keys[planck.keymap.indexOf key]
 	if dir
+		# Update live image
 		pressed.style.bg = 'red'
+		
+		# Update log
+		if key in Object.keys keylog
+			keylog[key]++
+		else
+			keylog[key] = 1
+		
+		updateHotkeys()
 		
 		# Remove sticky keys #TODO fix sending of keys
 		setTimeout () ->
 			update key, 0
 		, 3000
 	else
+		# Update live image
 		pressed.style.bg = 'none'
-	screen.render()
 	return
+
+updateHotkeys = () ->
+	# Remove all previous graphbars from screen
+	for bar in hotkeyBars
+		for blessedObject in bar
+			screen.remove blessedObject
+
+	# Clear storage of bars
+	hotkeyBars = []
+
+	hotkeys = getKeysWithHighestValues keylog, 8
+	
+	
+	maxWidth = 67
+	maxValue = keylog[hotkeys[0]]
+	
+	i = 0
+	for key in hotkeys
+		w = Math.floor keylog[key] * maxWidth / maxValue
+		bar = graphBar key, w, keylog[key], i++
+		
+		# Store bars i array
+		hotkeyBars.push bar
+		
+		# append screen objects
+		for blessedObject in bar
+			screen.append blessedObject
 
 a = 0
 fs.watch log, (e, f) ->
@@ -128,6 +194,7 @@ fs.watch log, (e, f) ->
 		exec "tail -1 #{log}", (err, stdout, stderr) ->
 			[key, dir] = stdout.split(' ')
 			update key, parseInt dir
+			screen.render()
 
 # (5) Start
 screen.render()
