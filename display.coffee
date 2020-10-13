@@ -137,8 +137,44 @@ graphBar = (key, w, n, i) ->
 			content: nstr]
 
 # Stats
+statistic = (name, stat, i) ->
+	screen.append blessed.text
+		top: 11 + i
+		left: 2
+		width: name.length
+		height: 1
+		content: name
+		fg: 'cyan'
+	screen.append blessed.text
+		top: 11 + i
+		left: 2 + name.length
+		height: 1
+		content: stat
+
 window 10, 0, 61, 10, ' Stats '
- 
+statistic 'OS: ', 'Unbuntu...', 0
+statistic 'Kernel: ', os.release(), 1
+
+# Uptime
+uptime = os.uptime()
+uptimeText = "#{Math.floor uptime / (60)**2 / 24} days, #{Math.floor (uptime / 60**2) % 24} hours, #{Math.floor (uptime / 60) % 60} mins"
+statistic 'Uptime: ', uptimeText, 2
+
+# Cpu
+cpu = os.cpus()[0]['model']
+make = cpu.slice 0, 5
+model = cpu.slice 18, 25
+count = os.cpus().length
+speed = cpu.slice 30, 39
+statistic 'CPU: ', "#{make} #{model} x#{count} #{speed}", 3
+
+# Memory
+total = os.totalmem()
+used = Math.floor (total - os.freemem()) / 1024**2
+total = Math.floor total / 1024**2
+percentage = (Math.floor used / total) * 100
+statistic 'Memory: ', "#{used}MiB / #{total}MiB (#{used}%)", 4
+
 # (4) Updating
 update = (key, dir) ->
 	return if not planck.keymap.includes key
