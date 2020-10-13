@@ -7,8 +7,5 @@ Warning, janky botched code.
 Python3 on clientside for the simple keyboard input, writing to file.
 Node reading file with bash for the speed, drawing to terminal using blessed.
 
-**Old gui, styling for later (ctrl and alt are being held for screencap)**
-<img src="https://i.imgur.com/y27Uyhj.png"/>
-
 **New gui, based on blessed**
-<img width="200%" height="200%" src="https://i.imgur.com/HRficmj.png"/>
+<img width="200%" height="200%" src="https://i.imgur.com/ZBzc2Qz.png"/>
