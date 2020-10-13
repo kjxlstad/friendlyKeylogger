@@ -198,6 +198,7 @@ update = (key, dir) ->
 	else
 		# Update live image
 		pressed.style.bg = 'none'
+	screen.render()
 	return
 
 updateHotkeys = () ->
@@ -234,7 +235,6 @@ fs.watch log, (e, f) ->
 		exec "tail -1 #{log}", (err, stdout, stderr) ->
 			[key, dir] = stdout.split(' ')
 			update key, parseInt dir
-			screen.render()
 
 # (5) Start
 screen.render()
