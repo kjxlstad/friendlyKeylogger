@@ -41,7 +41,7 @@ windowBorder = (top, left, width, height) ->
 		height: height
 		border:
 			type: 'line'
-			fg: 'magenta'
+			fg: 'red'
 	
 keyBox = (x, y, w, h) ->
 	return blessed.box
@@ -51,7 +51,7 @@ keyBox = (x, y, w, h) ->
 		height: h + 1
 		border:
 			type: 'line'
-			fg: 'magenta'
+			fg: 'red'
 
 getKeysWithHighestValues = (o, n) ->
 	keys = Object.keys o
@@ -128,7 +128,7 @@ graphBar = (key, w, n, i) ->
 			height: 3
 			border:
 				type: 'line'
-				fg: 'cyan',
+				fg: 'magenta',
 		blessed.text
 			top: 3 + 2 * i
 			left: 69
@@ -144,7 +144,7 @@ statistic = (name, stat, i) ->
 		width: name.length
 		height: 1
 		content: name
-		fg: 'cyan'
+		fg: 'magenta'
 	screen.append blessed.text
 		top: 11 + i
 		left: 2 + name.length
