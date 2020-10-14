@@ -13,5 +13,6 @@ Node reading file with bash for the speed, drawing to terminal using blessed.
 
 
 **TODO:**
-Divide into classes in seperate files
-Comment
+- Divide into classes in seperate files
+- Real comments
+- Make windows dynamically resize
