@@ -149,8 +149,8 @@ text = (top, left, height, content, color) ->
 
 statistic = (name, stat, i) ->
 	return [
-		(text 11 + i, 2,               1,  name, 'magenta'),
-		(text 11 + i, 2 + name.length, 1,  stat, 'white'  )
+		(text 12 + i, 5,               1,  name, 'magenta'),
+		(text 12 + i, 5 + name.length, 1,  stat, 'white'  )
 	]
 
 
@@ -191,9 +191,24 @@ for key of usage
 
 stats['Memory'] = statistic 'Memory: ', "#{usage['Used']} MiB / #{usage['Total']} MiB #{usage['Percentage']}%", 4
 
+# Address
+stats['Address'] = statistic 'Address: ', os.networkInterfaces()['eth0'][0]['cidr'], 5
+
 for key of stats
 	for elem in stats[key]
 		screen.append elem
+
+# Peepo
+peepoFrame = 0
+currentPeepo = blessed.ANSIImage
+	file: 'peepo/frame0.gif'
+	top: 12
+	left: 43
+
+screen.append currentPeepo
+
+peepoUpdate = () -> currentPeepo.setImage "peepo/frame#{peepoFrame++ % 6}.gif"
+	
 
 # (4) Updating
 update = (key, dir) ->
@@ -203,6 +218,9 @@ update = (key, dir) ->
 		# Update live image
 		pressed.style.bg = 'red'
 		
+		# Update peepo
+		peepoUpdate()
+
 		# Update log
 		if key in Object.keys keylog
 			keylog[key]++
