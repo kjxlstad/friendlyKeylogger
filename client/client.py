@@ -20,5 +20,4 @@ def on_release(key) : write_to_file(clean_keycode(key) + ' 0')
 open(log, 'w').close()
 
 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener :
-#with keyboard.Listener(on_press=on_press) as listener :
 	listener.join()
