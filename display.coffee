@@ -80,26 +80,24 @@ screen.key ['escape', 'q', 'C-c'], (ch, key) ->
 
 # (3) Blessed visual layout
 # Header
-text = "friendly keylogger on #{os.hostname}"
+t = "friendly keylogger on #{os.hostname}" 
 screen.append blessed.text
 	top: 0
 	left: 1
-	width: text.length
+	content: t
+	width: t.length
 	height: 1
-	content: text
+	content: t
 
 # Time
-text = 'logging since '
-
 exec 'date +%H:%M', (err, stdout, stderr) ->
-	text += stdout
+	t = "logging since #{stdout}"
 	screen.append blessed.text
-		top: 0
 		right: 2
-		width: text.legnth
+		top: 0
+		width: t.length
 		height: 1
-		align: 'right'
-		content: text
+		content: t
 	screen.render()
 
 # Planck
@@ -114,7 +112,8 @@ window 1, 61, screen.width - (61 + 1), 19, ' Hotkeys '
 
 graphBar = (key, w, n, i) ->
 	nstr = n.toString()
-	return [ blessed.text
+	return [
+		blessed.text
 			top: 3 + 2 * i
 			left: 63
 			width: 3
@@ -134,46 +133,67 @@ graphBar = (key, w, n, i) ->
 			left: 69
 			width: nstr.length
 			height: 1
-			content: nstr]
+			content: nstr
+		]
 
 # Stats
-statistic = (name, stat, i) ->
-	screen.append blessed.text
-		top: 11 + i
-		left: 2
-		width: name.length
+text = (top, left, height, content, color) ->
+	return blessed.text
+		top: top
+		left: left
+		width: content.length
 		height: 1
-		content: name
-		fg: 'magenta'
-	screen.append blessed.text
-		top: 11 + i
-		left: 2 + name.length
-		height: 1
-		content: stat
+		content: content
+		fg: color
+		
 
+statistic = (name, stat, i) ->
+	return [
+		(text 11 + i, 2,               1,  name, 'magenta'),
+		(text 11 + i, 2 + name.length, 1,  stat, 'white'  )
+	]
+
+
+stats = {}
 window 10, 0, 61, 10, ' Stats '
-statistic 'OS: ', 'Unbuntu...', 0
-statistic 'Kernel: ', os.release(), 1
+
+# OS
+stats['OS'] = statistic 'OS: ', 'Ubuntu...', 0
+
+# Kernel
+stats['Kernel'] = statistic 'Kernel: ', os.release(), 1
 
 # Uptime
-uptime = os.uptime()
-uptimeText = "#{Math.floor uptime / (60)**2 / 24} days, #{Math.floor (uptime / 60**2) % 24} hours, #{Math.floor (uptime / 60) % 60} mins"
-statistic 'Uptime: ', uptimeText, 2
+uptimes = {}
+uptimes['Days'] = os.uptime() / (60)**2 / 24
+uptimes['Hours'] = (os.uptime() / 60**2) % 24
+uptimes['Minutes'] = (os.uptime() / 60) % 60
 
-# Cpu
+for unit of uptimes
+	uptimes[unit] = Math.floor uptimes[unit]
+
+stats['Uptimes'] = statistic 'Uptime: ', "#{uptimes['Days']} days, #{uptimes['Hours']} hours, #{uptimes['Minutes']} mins", 2
+
+# CPU
 cpu = os.cpus()[0]['model']
-make = cpu.slice 0, 5
-model = cpu.slice 18, 25
-count = os.cpus().length
-speed = cpu.slice 30, 39
-statistic 'CPU: ', "#{make} #{model} x#{count} #{speed}", 3
+cputext = "#{cpu.slice 0, 5} #{cpu.slice 18, 25} (#{os.cpus().length}) #{cpu.slice 30, 39}"
+stats['CPU'] = statistic 'CPU: ', cputext, 3
 
 # Memory
 total = os.totalmem()
-used = Math.floor (total - os.freemem()) / 1024**2
-total = Math.floor total / 1024**2
-percentage = (Math.floor used / total) * 100
-statistic 'Memory: ', "#{used}MiB / #{total}MiB (#{used}%)", 4
+usage = {}
+usage['Used'] =  (total - os.freemem()) / 1024**2
+usage['Total'] = total / 1024**2
+usage['Percentage'] = usage['Used'] * 100 / usage['Total']
+
+for key of usage
+	usage[key] = Math.floor usage[key]
+
+stats['Memory'] = statistic 'Memory: ', "#{usage['Used']} MiB / #{usage['Total']} MiB #{usage['Percentage']}%", 4
+
+for key of stats
+	for elem in stats[key]
+		screen.append elem
 
 # (4) Updating
 update = (key, dir) ->
