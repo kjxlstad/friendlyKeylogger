@@ -10,3 +10,8 @@ Python3 on clientside for the simple keyboard input, writing to file.
 Node reading file with bash for the speed, drawing to terminal using blessed.
 
 <img width="200%" height="200%" src="https://i.imgur.com/ZBzc2Qz.png"/>
+
+
+**TODO:**
+Divide into classes in seperate files
+Comment
