@@ -201,7 +201,6 @@ for key of stats
 # Peepo
 peepoFrame = 0
 currentPeepo = blessed.ANSIImage
-	file: 'peepo/frame0.gif'
 	top: 12
 	left: 43
 
