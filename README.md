@@ -13,5 +13,6 @@ Coffescript node reading file with bash for the speed, drawing to terminal using
 
 **TODO:**
 - Divide into classes in seperate files
+- Seperate dom element handling from functional code
 - Real comments
 - Make windows dynamically resize
