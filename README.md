@@ -16,3 +16,4 @@ Coffescript node reading file with bash for the speed, drawing to terminal using
 - Seperate dom element handling from functional code
 - Real comments
 - Make windows dynamically resize
+- Hotkeys eight bars to be updated, not replaced
