@@ -62,6 +62,21 @@ createWindow = (top, left, width, height, title) ->
 	screen.append box top, left, width, height
 	screen.append titleText top, left, title
 
+# Statistic name and value
+statistic = (name, stat, i) ->
+	[
+		(leftText 12 + i, 5,                name, 'magenta'),
+		(fullText 12 + i, 5 + name.length, null, 30, stat, 'white')
+	]
+
+# Hotkey bar and according text
+hotkeyBar = (key, w, n, i) ->
+	[
+		(fullText 3 + 2 * i, 63, null, 3, key),
+	  	(box 2 + 2 * i, 67, w, 3, 'magenta'),
+	  	(leftText 3 + 2 * i, 69, n.toString())
+	]
+
 # Used to grab top 8 keys in keylog	
 getKeysWithHighestValues = (o, n) ->
 	keys = Object.keys o
@@ -105,26 +120,11 @@ screen.append titleText 1, 0, 'Planck'
 
 # Hotkeys
 hotkeyBars = []
-
 createWindow 1, 61, screen.width - (61 + 1), 19, 'Hotkeys'
 
-graphBar = (key, w, n, i) ->
-	[
-		(fullText 3 + 2 * i, 63, null, 3, key),
-	  	(box 2 + 2 * i, 67, w, 3, 'magenta'),
-	  	(leftText 3 + 2 * i, 69, n.toString())
-	]
-
 # Stats
-statistic = (name, stat, i) ->
-	[
-		(leftText 12 + i, 5,                name, 'magenta'),
-		(fullText 12 + i, 5 + name.length, null, 30, stat, 'white')
-	]
-
 stats = {}
 createWindow 10, 0, 61, 10, 'Stats'
-
 
 stats['OS'] = statistic 'OS: ', 'Ubuntu...', 0
 stats['Kernel'] = statistic 'Kernel: ', os.release(), 1
@@ -145,9 +145,10 @@ for key of stats
 updateStats = () ->
 	# Uptime
 	uptimes = {}
-	uptimes['Days'] = os.uptime() / (60)**2 / 24
-	uptimes['Hours'] = (os.uptime() / 60**2) % 24
-	uptimes['Minutes'] = (os.uptime() / 60) % 60
+	uptimeSeconds = os.uptime()
+	uptimes['Days'] = uptimeSeconds / (60)**2 / 24
+	uptimes['Hours'] = (uptimeSeconds / 60**2) % 24
+	uptimes['Minutes'] = (uptimeSeconds / 60) % 60
 
 	for unit of uptimes
 		uptimes[unit] = Math.floor uptimes[unit]
@@ -170,7 +171,8 @@ updateStats = () ->
 updateStats()
 setTimeout () ->
 	updateStats()
-, 60 * 1000
+	screen.render()
+, 1000
 
 # Peepo
 peepoFrame = 0
@@ -212,6 +214,7 @@ update = (key, dir) ->
 	screen.render()
 	return
 
+
 updateHotkeys = () ->
 	# Remove all previous graphbars from screen
 	for bar in hotkeyBars
@@ -220,18 +223,20 @@ updateHotkeys = () ->
 
 	# Clear storage of bars
 	hotkeyBars = []
-
+	
+	# Get most used keys
 	hotkeys = getKeysWithHighestValues keylog, 8
-	
-	
+		
+	# Settings
 	maxWidth = 64
 	minWidth = 6
 	maxValue = keylog[hotkeys[0]]
 	
+	# For every key : keypress pairs, create a hotkeyBar element and append to storage
 	i = 0
 	for key in hotkeys
-		w = minWidth + Math.floor keylog[key] * (maxWidth - minWidth) / maxValue 
-		bar = graphBar key, w, keylog[key], i++
+		w = minWidth + Math.floor keylog[key] * (maxWidth - minWidth) / maxValue
+		bar = hotkeyBar key, w, keylog[key], i++
 		
 		# Store bars i array
 		hotkeyBars.push bar
@@ -240,6 +245,7 @@ updateHotkeys = () ->
 		for blessedObject in bar
 			screen.append blessedObject
 
+# On logfile update, read new line and call update with key and direction
 a = 0
 fs.watch log, (e, f) ->
 	if a++ % 4 == 0
