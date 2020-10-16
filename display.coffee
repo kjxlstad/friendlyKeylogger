@@ -21,20 +21,25 @@ planck =
 keylog = {}
 
 # (2) Helpers
-window = (top, left, width, height, title) ->
-	windowBorder top, left, width, height
-	windowTitle top, left + 4, title
-	
-windowTitle = (top, left, title) ->
-	screen.append blessed.text
-		top: top
+
+fullText = (top, left, right, width, content, color = 'white') ->
+	blessed.text
 		left: left
-		width: title.length
+		right: right
+		top: top
+		width: width
 		height: 1
-		content: title
+		content: content
+		fg: color
+
+leftText = (top, left, content, color = 'white') -> fullText top, left, null, content.length, content, color
+
+rightText = (top, right, content) -> fullText top, null, right, content.length, content
+
+titleText = (top, left, content) -> leftText top, left + 4, " #{content} "
 
 windowBorder = (top, left, width, height) ->
-	screen.append blessed.box
+	blessed.box
 		top: top
 		left: left
 		width: width
@@ -43,6 +48,11 @@ windowBorder = (top, left, width, height) ->
 			type: 'line'
 			fg: 'red'
 	
+createWindow = (top, left, width, height, title) ->
+	screen.append windowBorder top, left, width, height
+	screen.append titleText top, left, title
+	
+
 keyBox = (x, y, w, h) ->
 	return blessed.box
 		top: y
@@ -80,46 +90,27 @@ screen.key ['escape', 'q', 'C-c'], (ch, key) ->
 
 # (3) Blessed visual layout
 # Header
-t = "friendly keylogger on #{os.hostname}" 
-screen.append blessed.text
-	top: 0
-	left: 1
-	content: t
-	width: t.length
-	height: 1
-	content: t
+screen.append leftText 0, 1, "friendly keylogger on #{os.hostname}"
 
 # Time
 exec 'date +%H:%M', (err, stdout, stderr) ->
-	t = "logging since #{stdout}"
-	screen.append blessed.text
-		right: 2
-		top: 0
-		width: t.length
-		height: 1
-		content: t
+	screen.append rightText 0, 1, "logging since #{stdout}"
 	screen.render()
 
 # Planck
 keyWidth = 4
 keyHeight = 2
 keys = (getKeyBox i % planck.width, Math.floor i / planck.width for i in [0 ... planck.height * planck.width])
-windowTitle 1, 4, ' Planck '
+screen.append titleText 1, 0, 'Planck'
 
 # Hotkeys
 hotkeyBars = []
-window 1, 61, screen.width - (61 + 1), 19, ' Hotkeys '
+createWindow 1, 61, screen.width - (61 + 1), 19, 'Hotkeys'
 
 graphBar = (key, w, n, i) ->
 	nstr = n.toString()
 	return [
-		blessed.text
-			top: 3 + 2 * i
-			left: 63
-			width: 3
-			height: 1
-			content: key
-			align: 'center',
+		(fullText 3 + 2 * i, 63, null, 3, key),
 		blessed.box
 			top: 2 + 2 * i
 			left: 67
@@ -128,34 +119,19 @@ graphBar = (key, w, n, i) ->
 			border:
 				type: 'line'
 				fg: 'magenta',
-		blessed.text
-			top: 3 + 2 * i
-			left: 69
-			width: nstr.length
-			height: 1
-			content: nstr
+		(leftText 3 + 2 * i, 69, nstr)	
 		]
 
 # Stats
-text = (top, left, height, content, color) ->
-	return blessed.text
-		top: top
-		left: left
-		width: content.length
-		height: 1
-		content: content
-		fg: color
-		
-
 statistic = (name, stat, i) ->
 	return [
-		(text 12 + i, 5,               1,  name, 'magenta'),
-		(text 12 + i, 5 + name.length, 1,  stat, 'white'  )
+		(leftText 12 + i, 5,                name, 'magenta'),
+		(leftText 12 + i, 5 + name.length,  stat, 'white'  )
 	]
 
 
 stats = {}
-window 10, 0, 61, 10, ' Stats '
+createWindow 10, 0, 61, 10, 'Stats'
 
 # OS
 stats['OS'] = statistic 'OS: ', 'Ubuntu...', 0
