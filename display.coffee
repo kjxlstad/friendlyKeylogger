@@ -119,25 +119,11 @@ screen.append titleText 1, 0, 'Planck'
 
 # Hotkeys
 hotkeyBars = []
-createWindow 1, 61, screen.width - 61, 23, 'Hotkeys'
+createWindow 1, 61, screen.width - 61, 19, 'Hotkeys'
 
 # Stats
 stats = {}
 createWindow 10, 0, 61, 10, 'Stats'
-
-createWindow 20, 0, 61, 4, 'Yank my doodle'
-
-progressBar = (top, left, width, value) ->
-	blessed.ProgressBar
-		top: top
-		left: left
-		width: width
-		height: 1
-		filled: value
-		bg: 'red'
-		fg: 'black'
-
-screen.append progressBar 21, 1, 59, 50
 
 stats['OS'] = statistic 'OS: ', 'Ubuntu 16.04.02', 0
 stats['Kernel'] = statistic 'Kernel: ', os.release(), 1
@@ -242,7 +228,7 @@ updateHotkeys = () ->
 	hotkeyBars = []
 	
 	# Get most used keys
-	hotkeys = getKeysWithHighestValues keylog, 10
+	hotkeys = getKeysWithHighestValues keylog, 8
 		
 	# Settings
 	maxWidth = 65
