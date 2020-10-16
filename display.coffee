@@ -21,7 +21,6 @@ planck =
 keylog = {}
 
 # (2) Helpers
-
 # Text with all used options
 fullText = (top, left, right, width, content, color = 'white') ->
 	blessed.text
@@ -42,7 +41,8 @@ rightText = (top, right, content) -> fullText top, null, right, content.length, 
 # Title text with extra padding
 titleText = (top, left, content) -> leftText top, left + 4, " #{content} "
 
-windowBorder = (top, left, width, height) ->
+# Box with all used fields
+box = (top, left, width, height, color = 'red') ->
 	blessed.box
 		top: top
 		left: left
@@ -50,23 +50,17 @@ windowBorder = (top, left, width, height) ->
 		height: height
 		border:
 			type: 'line'
-			fg: 'red'
-	
+			fg: color
+
+# Boxes for drawing keyboard
+keyBox = (x, y, w, h) ->
+	box y, x, w + 2, h + 1
+		
+# Regular window
 createWindow = (top, left, width, height, title) ->
-	screen.append windowBorder top, left, width, height
+	screen.append box top, left, width, height
 	screen.append titleText top, left, title
 	
-
-keyBox = (x, y, w, h) ->
-	return blessed.box
-		top: y
-		left: x
-		width: w + 2
-		height: h + 1
-		border:
-			type: 'line'
-			fg: 'red'
-
 getKeysWithHighestValues = (o, n) ->
 	keys = Object.keys o
 	keys.sort (a, b) ->
@@ -112,19 +106,9 @@ hotkeyBars = []
 createWindow 1, 61, screen.width - (61 + 1), 19, 'Hotkeys'
 
 graphBar = (key, w, n, i) ->
-	nstr = n.toString()
-	return [
-		(fullText 3 + 2 * i, 63, null, 3, key),
-		blessed.box
-			top: 2 + 2 * i
-			left: 67
-			width: w
-			height: 3
-			border:
-				type: 'line'
-				fg: 'magenta',
-		(leftText 3 + 2 * i, 69, nstr)	
-		]
+	[ (fullText 3 + 2 * i, 63, null, 3, key),
+	  (box 2 + 2 * i, 67, w, 3, 'magenta'),
+	  (leftText 3 + 2 * i, 69, n.toString()) ]
 
 # Stats
 statistic = (name, stat, i) ->
