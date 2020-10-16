@@ -5,7 +5,6 @@ blessed = require 'blessed'
 os = require 'os'
 require('dotenv').config()
 log = process.env.WINPATH
-
 screen = blessed.screen {smartCSR: true, dockBorders: true}
 	
 # Current keyboard specifics TODO: move to config file

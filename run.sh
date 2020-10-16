@@ -7,20 +7,34 @@ if [ $# -eq 0 ]; then
 	exit;
 fi
 
-dir=/mnt/c"$1"/friendlyKeyloggerClient/
+dir=/mnt/c"$1"/friendlyKeyloggerClient
 
 if [[ -d "$dir" ]]; then
-	read -p "Folder $dir allready exists, do you want to overwrite it? y/n"
-	case $yn in
-		[Yy]* ) rm -r "$dir"; break;;
-		[Nn]* ) exit;;
-		* ) echo "Please answer yes or no"
-	esac
+	echo "Folder $dir allready exists, do you want to overwrite it?"
+	select yn in "Yes" "No"; do
+		case $yn in
+			Yes ) rm -r "$dir"; mkdir $dir; cp -r client "$dir"/; break;;
+			No ) break;;
+		esac
+	done
 fi
-
-mkdir $dir
-cp -r client "$dir"/client
 	
-log="$dir"log.log
+log="$dir"/log.log
 echo WINPATH="$log" > .env
 touch "$log"
+
+echo "Run client as windows admin now?"
+select yn in "Yes" "No"; do
+	case $yn in
+		Yes ) cd "$dir"/client; cmd.exe /c runElevatedClient.bat; break;;
+		No ) exit;;
+	esac
+done
+
+echo "Run display host in this window?"
+select yn in "Yes" "No"; do
+	case $yn in
+		Yes ) cd; cd friendlyKeylogger; coffee -c display.coffee; node display.js; break;;
+		No ) exit;;
+	esac
+done
