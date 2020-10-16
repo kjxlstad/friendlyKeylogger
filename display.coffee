@@ -6,17 +6,18 @@ os = require 'os'
 require('dotenv').config()
 log = process.env.WINPATH
 
-
 screen = blessed.screen {smartCSR: true, dockBorders: true}
 	
 # Current keyboard specifics TODO: move to config file
 planck =
 	width: 12
 	height: 4
-	keymap: [ '', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'backspace',
-		'tab', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'',
-		'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'enter',
-		'esc', 'ctrl_l', 'cmd', 'alt_l', '', 'space', 'space', '', 'left', 'down', 'up', 'right' ]
+	keymap: [
+		'',      'q',      'w',   'e',    'r', 't',     'y',     'u', 'i',    'o',    'p',  'backspace',
+		'tab',   'a',      's',   'd',    'f', 'g',     'h',     'j', 'k',    'l',    ';',  '\'',
+		'shift', 'z',      'x',   'c',    'v', 'b',     'n',     'm', ',',    '.',    '/',  'enter',
+		'esc',   'ctrl_l', 'cmd', 'alt_l', '', 'space', 'space', '',  'left', 'down', 'up', 'right'
+	]
 
 keylog = {}
 
@@ -60,7 +61,8 @@ keyBox = (x, y, w, h) ->
 createWindow = (top, left, width, height, title) ->
 	screen.append box top, left, width, height
 	screen.append titleText top, left, title
-	
+
+# Used to grab top 8 keys in keylog	
 getKeysWithHighestValues = (o, n) ->
 	keys = Object.keys o
 	keys.sort (a, b) ->
@@ -103,64 +105,72 @@ screen.append titleText 1, 0, 'Planck'
 
 # Hotkeys
 hotkeyBars = []
+
 createWindow 1, 61, screen.width - (61 + 1), 19, 'Hotkeys'
 
 graphBar = (key, w, n, i) ->
-	[ (fullText 3 + 2 * i, 63, null, 3, key),
-	  (box 2 + 2 * i, 67, w, 3, 'magenta'),
-	  (leftText 3 + 2 * i, 69, n.toString()) ]
+	[
+		(fullText 3 + 2 * i, 63, null, 3, key),
+	  	(box 2 + 2 * i, 67, w, 3, 'magenta'),
+	  	(leftText 3 + 2 * i, 69, n.toString())
+	]
 
 # Stats
 statistic = (name, stat, i) ->
-	return [
+	[
 		(leftText 12 + i, 5,                name, 'magenta'),
-		(leftText 12 + i, 5 + name.length,  stat, 'white'  )
+		(fullText 12 + i, 5 + name.length, null, 30, stat, 'white')
 	]
-
 
 stats = {}
 createWindow 10, 0, 61, 10, 'Stats'
 
-# OS
+
 stats['OS'] = statistic 'OS: ', 'Ubuntu...', 0
-
-# Kernel
 stats['Kernel'] = statistic 'Kernel: ', os.release(), 1
+stats['Uptimes'] = statistic 'Uptime: ', ' ', 2
 
-# Uptime
-uptimes = {}
-uptimes['Days'] = os.uptime() / (60)**2 / 24
-uptimes['Hours'] = (os.uptime() / 60**2) % 24
-uptimes['Minutes'] = (os.uptime() / 60) % 60
-
-for unit of uptimes
-	uptimes[unit] = Math.floor uptimes[unit]
-
-stats['Uptimes'] = statistic 'Uptime: ', "#{uptimes['Days']} days, #{uptimes['Hours']} hours, #{uptimes['Minutes']} mins", 2
-
-# CPU
 cpu = os.cpus()[0]['model']
 cputext = "#{cpu.slice 0, 5} #{cpu.slice 18, 25} (#{os.cpus().length}) #{cpu.slice 30, 39}"
 stats['CPU'] = statistic 'CPU: ', cputext, 3
 
-# Memory
-total = os.totalmem()
-usage = {}
-usage['Used'] =  (total - os.freemem()) / 1024**2
-usage['Total'] = total / 1024**2
-usage['Percentage'] = usage['Used'] * 100 / usage['Total']
 
-for key of usage
-	usage[key] = Math.floor usage[key]
-
-stats['Memory'] = statistic 'Memory: ', "#{usage['Used']} MiB / #{usage['Total']} MiB #{usage['Percentage']}%", 4
-
-# Address
+stats['Memory'] = statistic 'Memory: ', ' ', 4
 stats['Address'] = statistic 'Address: ', os.networkInterfaces()['eth0'][0]['cidr'], 5
 
 for key of stats
 	for elem in stats[key]
 		screen.append elem
+
+updateStats = () ->
+	# Uptime
+	uptimes = {}
+	uptimes['Days'] = os.uptime() / (60)**2 / 24
+	uptimes['Hours'] = (os.uptime() / 60**2) % 24
+	uptimes['Minutes'] = (os.uptime() / 60) % 60
+
+	for unit of uptimes
+		uptimes[unit] = Math.floor uptimes[unit]
+
+	stats['Uptimes'][1].setContent "#{uptimes['Days']} days, #{uptimes['Hours']} hours, #{uptimes['Minutes']} mins"
+
+	# Memory
+	total = os.totalmem()
+	usage = {}
+	usage['Used'] =  (total - os.freemem()) / 1024**2
+	usage['Total'] = total / 1024**2
+	usage['Percentage'] = usage['Used'] * 100 / usage['Total']
+
+	for key of usage
+		usage[key] = Math.floor usage[key]
+
+	stats['Memory'][1].setContent "#{usage['Used']} MiB / #{usage['Total']} MiB #{usage['Percentage']}%"
+
+# Initial and minutly update of stats
+updateStats()
+setTimeout () ->
+	updateStats()
+, 60 * 1000
 
 # Peepo
 peepoFrame = 0
