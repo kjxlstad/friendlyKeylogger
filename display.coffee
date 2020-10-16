@@ -171,7 +171,7 @@ updateStats()
 setTimeout () ->
 	updateStats()
 	screen.render()
-, 1000
+, 60 * 1000
 
 # Peepo
 peepoFrame = 0
