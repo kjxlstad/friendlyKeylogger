@@ -108,7 +108,7 @@ screen.append leftText 0, 1, "friendly keylogger on #{os.hostname}"
 
 # Time
 exec 'date +%H:%M', (err, stdout, stderr) ->
-	screen.append rightText 0, 1, "logging since #{stdout}"
+	screen.append rightText 0, 0, "logging since #{stdout}"
 	screen.render()
 
 # Planck
@@ -119,13 +119,27 @@ screen.append titleText 1, 0, 'Planck'
 
 # Hotkeys
 hotkeyBars = []
-createWindow 1, 61, screen.width - (61 + 1), 19, 'Hotkeys'
+createWindow 1, 61, screen.width - 61, 23, 'Hotkeys'
 
 # Stats
 stats = {}
 createWindow 10, 0, 61, 10, 'Stats'
 
-stats['OS'] = statistic 'OS: ', 'Ubuntu...', 0
+createWindow 20, 0, 61, 4, 'Yank my doodle'
+
+progressBar = (top, left, width, value) ->
+	blessed.ProgressBar
+		top: top
+		left: left
+		width: width
+		height: 1
+		filled: value
+		bg: 'red'
+		fg: 'black'
+
+screen.append progressBar 21, 1, 59, 50
+
+stats['OS'] = statistic 'OS: ', 'Ubuntu 16.04.02', 0
 stats['Kernel'] = statistic 'Kernel: ', os.release(), 1
 stats['Uptimes'] = statistic 'Uptime: ', ' ', 2
 
@@ -135,7 +149,7 @@ stats['CPU'] = statistic 'CPU: ', cputext, 3
 
 
 stats['Memory'] = statistic 'Memory: ', ' ', 4
-stats['Address'] = statistic 'Address: ', os.networkInterfaces()['eth0'][0]['cidr'], 5
+stats['Keystrokes'] = statistic 'Keystrokes: ', '0', 5
 
 for key of stats
 	for elem in stats[key]
@@ -153,7 +167,7 @@ updateStats = () ->
 		uptimes[unit] = Math.floor uptimes[unit]
 
 	stats['Uptimes'][1].setContent "#{uptimes['Days']} days, #{uptimes['Hours']} hours, #{uptimes['Minutes']} mins"
-
+	
 	# Memory
 	total = os.totalmem()
 	usage = {}
@@ -165,13 +179,14 @@ updateStats = () ->
 		usage[key] = Math.floor usage[key]
 
 	stats['Memory'][1].setContent "#{usage['Used']} MiB / #{usage['Total']} MiB #{usage['Percentage']}%"
+	
+	# Total keystrokes
+	s = 0
+	for key of keylog
+		s += keylog[key]
+	stats['Keystrokes'][1].setContent s.toString()
 
-# Initial and minutly update of stats
 updateStats()
-setTimeout () ->
-	updateStats()
-	screen.render()
-, 60 * 1000
 
 # Peepo
 peepoFrame = 0
@@ -194,7 +209,7 @@ update = (key, dir) ->
 		
 		# Update peepo
 		peepoUpdate()
-
+	
 		# Update log
 		if key in Object.keys keylog
 			keylog[key]++
@@ -203,6 +218,9 @@ update = (key, dir) ->
 		
 		updateHotkeys()
 		
+		# Update statistics
+		updateStats()
+				
 		# Remove sticky keys #TODO fix sending of keys
 		setTimeout () ->
 			update key, 0
@@ -224,10 +242,10 @@ updateHotkeys = () ->
 	hotkeyBars = []
 	
 	# Get most used keys
-	hotkeys = getKeysWithHighestValues keylog, 8
+	hotkeys = getKeysWithHighestValues keylog, 10
 		
 	# Settings
-	maxWidth = 64
+	maxWidth = 65
 	minWidth = 6
 	maxValue = keylog[hotkeys[0]]
 	

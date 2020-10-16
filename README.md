@@ -14,3 +14,4 @@ Coffescript node reading file with bash for the speed, drawing to terminal using
 **TODO:**
 - Divide into classes in seperate files
 - Make windows dynamically resize
+- Make hotkey graphs progressbars instead of boxes
