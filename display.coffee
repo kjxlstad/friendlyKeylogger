@@ -34,7 +34,7 @@ windowTitle = (top, left, title) ->
 		content: title
 
 windowBorder = (top, left, width, height) ->
-	screen.append blessed.text
+	screen.append blessed.box
 		top: top
 		left: left
 		width: width
