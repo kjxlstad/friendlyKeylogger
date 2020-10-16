@@ -22,6 +22,7 @@ keylog = {}
 
 # (2) Helpers
 
+# Text with all used options
 fullText = (top, left, right, width, content, color = 'white') ->
 	blessed.text
 		left: left
@@ -32,10 +33,13 @@ fullText = (top, left, right, width, content, color = 'white') ->
 		content: content
 		fg: color
 
+# Most common left aligned text
 leftText = (top, left, content, color = 'white') -> fullText top, left, null, content.length, content, color
 
+# Once used right aligned text
 rightText = (top, right, content) -> fullText top, null, right, content.length, content
 
+# Title text with extra padding
 titleText = (top, left, content) -> leftText top, left + 4, " #{content} "
 
 windowBorder = (top, left, width, height) ->
