@@ -52,6 +52,21 @@ box = (top, left, width, height, color = 'red') ->
 			type: 'line'
 			fg: color
 
+
+bar = (top, left, width) ->
+	blessed.ProgressBar
+		top: top
+		left: left
+		width: width
+		height: 3
+		style:
+			bar:
+				bg: 'magenta'
+
+b = bar 20, 0, 20
+b.setProgress(50)
+screen.append b
+
 # Boxes for drawing keyboard
 keyBox = (x, y, w, h) ->
 	box y, x, w + 2, h + 1
@@ -75,6 +90,7 @@ hotkeyBar = (key, w, n, i) ->
 	  	(box 2 + 2 * i, 67, w, 3, 'magenta'),
 	  	(leftText 3 + 2 * i, 69, n.toString())
 	]
+
 
 # Used to grab top 8 keys in keylog	
 getKeysWithHighestValues = (o, n) ->
@@ -116,6 +132,8 @@ keyWidth = 4
 keyHeight = 2
 keys = (getKeyBox i % planck.width, Math.floor i / planck.width for i in [0 ... planck.height * planck.width])
 screen.append titleText 1, 0, 'Planck'
+
+
 
 # Hotkeys
 hotkeyBars = []
