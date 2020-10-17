@@ -52,21 +52,6 @@ box = (top, left, width, height, color = 'red') ->
 			type: 'line'
 			fg: color
 
-
-bar = (top, left, width) ->
-	blessed.ProgressBar
-		top: top
-		left: left
-		width: width
-		height: 3
-		style:
-			bar:
-				bg: 'magenta'
-
-b = bar 20, 0, 20
-b.setProgress(50)
-screen.append b
-
 # Boxes for drawing keyboard
 keyBox = (x, y, w, h) ->
 	box y, x, w + 2, h + 1
@@ -90,7 +75,6 @@ hotkeyBar = (key, w, n, i) ->
 	  	(box 2 + 2 * i, 67, w, 3, 'magenta'),
 	  	(leftText 3 + 2 * i, 69, n.toString())
 	]
-
 
 # Used to grab top 8 keys in keylog	
 getKeysWithHighestValues = (o, n) ->
@@ -133,8 +117,6 @@ keyHeight = 2
 keys = (getKeyBox i % planck.width, Math.floor i / planck.width for i in [0 ... planck.height * planck.width])
 screen.append titleText 1, 0, 'Planck'
 
-
-
 # Hotkeys
 hotkeyBars = []
 createWindow 1, 61, screen.width - 61, 19, 'Hotkeys'
@@ -159,7 +141,7 @@ for key of stats
 	for elem in stats[key]
 		screen.append elem
 
-updateStats = () ->
+updateUptime = () ->
 	# Uptime
 	uptimes = {}
 	uptimeSeconds = os.uptime()
@@ -172,6 +154,7 @@ updateStats = () ->
 
 	stats['Uptimes'][1].setContent "#{uptimes['Days']} days, #{uptimes['Hours']} hours, #{uptimes['Minutes']} mins"
 	
+updateMemory = () ->
 	# Memory
 	total = os.totalmem()
 	usage = {}
@@ -183,14 +166,20 @@ updateStats = () ->
 		usage[key] = Math.floor usage[key]
 
 	stats['Memory'][1].setContent "#{usage['Used']} MiB / #{usage['Total']} MiB #{usage['Percentage']}%"
-	
-	# Total keystrokes
+
+updateKeystrokeStat = () ->
 	s = 0
 	for key of keylog
 		s += keylog[key]
 	stats['Keystrokes'][1].setContent s.toString()
 
-updateStats()
+updateUptime()
+updateMemory()
+
+setTimeout () ->
+	updateUptime()
+	updateMemory()
+, 1000
 
 # Peepo
 peepoFrame = 0
@@ -223,7 +212,7 @@ update = (key, dir) ->
 		updateHotkeys()
 		
 		# Update statistics
-		updateStats()
+		updateKeystrokeStat()
 				
 		# Remove sticky keys #TODO fix sending of keys
 		setTimeout () ->
